@@ -6,7 +6,7 @@ import React from 'react';
 import { getConferenceNameForTitle } from '../../../base/conference';
 import { translate } from '../../../base/i18n';
 import { connect as reactReduxConnect } from '../../../base/redux';
-
+import { connect, disconnect } from '../../../base/connector';
 import {
     AbstractConference,
     abstractMapStateToProps
@@ -54,16 +54,8 @@ class Conference extends AbstractConference<Props, *> {
      * @inheritdoc
      */
     componentDidMount() {
-    }
-
-    /**
-     * Calls into legacy UI to update the application layout, if necessary.
-     *
-     * @inheritdoc
-     * returns {void}
-     */
-    componentDidUpdate(prevProps) {
-      
+      document.title = `${this.props._roomName} | ${interfaceConfig.APP_NAME}`;
+      this._start();
     }
 
     /**
@@ -73,7 +65,13 @@ class Conference extends AbstractConference<Props, *> {
      * @inheritdoc
      */
     componentWillUnmount() {
-     
+      APP.classroom.isJoined() && this.props.dispatch(disconnect());
+    }
+
+    _start() {
+      const { dispatch, t } = this.props;
+      
+      dispatch(connect());
     }
 
     /**
@@ -84,8 +82,11 @@ class Conference extends AbstractConference<Props, *> {
      */
     render() {
        return (
-         <div>
-           sdfjios
+         <div id="classroom_page">
+           <div className="classroom_page-seat">
+
+           </div>
+           <div className="classroom_page-board"></div>
          </div>
        )
     }

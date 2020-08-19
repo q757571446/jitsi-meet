@@ -1,0 +1,14 @@
+#classroom_page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  .classroom_page-seat {
+    height: 100px;
+    background: #F2F4F6;
+  }
+  .classroom_page-board {
+    flex: 1;
+    background: #FFFFFF;
+  }
+}
