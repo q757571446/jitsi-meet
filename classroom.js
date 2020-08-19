@@ -11,7 +11,9 @@ import {
     JitsiMediaDevicesEvents,
 } from './react/features/base/lib-jitsi-meet';
 
-import { mediaPermissionPromptVisibilityChanged } from './react/features/overlay';
+import {
+    mediaPermissionPromptVisibilityChanged
+} from './react/features/overlay';
 
 import {
     openConnection
@@ -33,6 +35,14 @@ function connect(roomName) {
             APP.UI.notifyConnectionFailed(err);
             throw err;
         });
+}
+
+/**
+ * Mute or unmute local audio stream if it exists.
+ * @param {boolean} muted - if audio stream should be muted or unmuted.
+ */
+function muteLocalAudio(muted) {
+    APP.store.dispatch(setAudioMuted(muted));
 }
 
 export default {
@@ -131,7 +141,7 @@ export default {
         let requestedVideo = false;
 
         if (options.startWithAudioMuted) {
-            // this.muteAudio(true, true);
+            this.muteAudio(true, true);
         }
 
         if (!options.startWithVideoMuted &&
@@ -216,5 +226,44 @@ export default {
             tryCreateLocalTracks,
             errors
         };
-    }
+    },
+
+    /**
+     * Simulates toolbar button click for audio mute. Used by shortcuts and API.
+     * @param {boolean} mute true for mute and false for unmute.
+     * @param {boolean} [showUI] when set to false will not display any error
+     * dialogs in case of media permissions error.
+     */
+    muteAudio(mute, showUI = true) {
+        if (!mute &&
+            isUserInteractionRequiredForUnmute(APP.store.getState())) {
+            logger.error('Unmuting audio requires user interaction');
+
+            return;
+        }
+
+        // Not ready to modify track's state yet
+        if (!this._localTracksInitialized) {
+            // This will only modify base/media.audio.muted which is then synced
+            // up with the track at the end of local tracks initialization.
+            muteLocalAudio(mute);
+            this.setAudioMuteStatus(mute);
+
+            return;
+        } else if (this.isLocalAudioMuted() === mute) {
+            // NO-OP
+            return;
+        }
+    },
+
+    /**
+     * Sets the audio muted status.
+     *
+     * @param {boolean} muted - New muted status.
+     */
+    setAudioMuteStatus(muted) {
+        APP.UI.setAudioMuted(this.getMyUserId(), muted);
+        APP.API.notifyAudioMutedStatusChanged(muted);
+    },
+
 }
