@@ -6,9 +6,11 @@ import type { Component } from 'react';
 import { isRoomValid } from '../base/conference';
 import { isSupportedBrowser } from '../base/environment';
 import { toState } from '../base/redux';
+import { Classroom } from '../classroom';
 import { Conference } from '../conference';
 import { getDeepLinkingPage } from '../deep-linking';
 import { UnsupportedDesktopBrowser } from '../unsupported-browser';
+
 import {
     BlankPage,
     WelcomePage,
@@ -98,7 +100,7 @@ function _getWebConferenceRoute(state): ?Promise<Route> {
             if (deepLinkComponent) {
                 route.component = deepLinkComponent;
             } else if (isSupportedBrowser()) {
-                route.component = Conference;
+                route.component = Classroom;
             } else {
                 route.component = UnsupportedDesktopBrowser;
             }
