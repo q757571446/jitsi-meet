@@ -11,12 +11,12 @@ import keyboardshortcut from './modules/keyboardshortcut/keyboardshortcut';
 import remoteControl from './modules/remotecontrol/RemoteControl';
 import translation from './modules/translation/translation';
 
-
 import classroom from './classroom'
-
+import classroomUI from './packages/UI'
 window.APP = {
     API,
     classroom,
+    classroomUI,
     conference,
 
     // Used by do_external_connect.js if we receive the attach data after

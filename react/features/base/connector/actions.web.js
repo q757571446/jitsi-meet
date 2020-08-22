@@ -41,5 +41,5 @@ export function connect() {
 export function disconnect(requestFeedback: boolean = false) {
     // XXX For web based version we use conference hanging up logic from the old
     // app.
-    return () => APP.conference.hangup(requestFeedback);
+    return () => APP.classroom.hangup(requestFeedback);
 }

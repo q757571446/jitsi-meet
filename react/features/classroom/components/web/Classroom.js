@@ -69,6 +69,7 @@ class Conference extends AbstractConference<Props, *> {
     }
 
     _start() {
+      APP.classroomUI.start();
       const { dispatch, t } = this.props;
       
       dispatch(connect());
