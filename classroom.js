@@ -423,7 +423,6 @@ export default {
             _replaceLocalVideoTrackQueue.enqueue(onFinish => {
                 const state = APP.store.getState();
 
-
                 APP.store.dispatch(
                         replaceLocalTrack(this.localVideo,
                             newTrack, room))

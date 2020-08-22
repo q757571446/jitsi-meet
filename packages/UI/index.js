@@ -1,9 +1,10 @@
 import messageHandler from './util/MessageHandler';
+import SeatLayout from './seat/SeatLayout';
 
 const UI = {}
 
 UI.start = function() {
-
+  SeatLayout.init()
 }
 
 /**
@@ -33,7 +34,7 @@ UI.notifyConnectionFailed = function(stropheErrorMsg) {
  * @param {JitsiTrack} track stream to show
  */
 UI.addLocalVideoStream = track => {
-  
+  SeatLayout.changeLocalVideo(track)
 };
 
 /**

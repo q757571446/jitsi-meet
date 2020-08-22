@@ -85,7 +85,9 @@ class Conference extends AbstractConference<Props, *> {
        return (
          <div id="classroom_page">
            <div className="classroom_page-seat">
+            <div id="classroomLocalVideo">
 
+            </div>
            </div>
            <div className="classroom_page-board"></div>
          </div>
