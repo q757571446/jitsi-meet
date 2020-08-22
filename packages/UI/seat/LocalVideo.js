@@ -1,14 +1,22 @@
 import {
     VideoTrack
 } from '../../../react/features/base/media';
-import React, { Component } from 'react';
+import React, {
+    Component
+} from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { getLocalVideoTrack } from '../../../react/features/base/tracks';
+import {
+    Provider
+} from 'react-redux';
+import {
+    getLocalVideoTrack
+} from '../../../react/features/base/tracks';
+import SeatVideo from './SeatVideo';
 
-export default class LocalVideo {
+export default class LocalVideo extends SeatVideo{
 
     constructor() {
+        super()
         this.videoSpanId = 'localVideoContainer';
         this.container = this.createContainer();
         this.$container = $(this.container);
@@ -17,7 +25,7 @@ export default class LocalVideo {
     }
 
     createContainer() {
-        const containerSpan = document.createElement('span');
+        const containerSpan = document.createElement('div');
 
         containerSpan.classList.add('videocontainer');
         containerSpan.id = this.videoSpanId;
@@ -34,20 +42,7 @@ export default class LocalVideo {
         return containerSpan;
     }
 
-    /**
-     * Sets the size of the thumbnail.
-     */
-    _setThumbnailSize() {
-        const heightToWidthPercent = 100 /
-            (this.isLocal ? interfaceConfig.LOCAL_THUMBNAIL_RATIO :
-                interfaceConfig.REMOTE_THUMBNAIL_RATIO);
-
-        this.$container.css('padding-top', `${heightToWidthPercent}%`);
-        // this.$avatar().css({
-        //     height: '50%',
-        //     width: `${heightToWidthPercent / 2}%`
-        // });
-    }
+ 
 
     /**
      * Places the {@code LocalVideo} in the DOM based on the current video layout.

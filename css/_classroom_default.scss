@@ -6,6 +6,9 @@
   .classroom_page-seat {
     height: 100px;
     background: #F2F4F6;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
   .classroom_page-board {
     flex: 1;
