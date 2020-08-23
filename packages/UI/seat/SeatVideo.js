@@ -13,8 +13,8 @@ export default class SeatVideo {
      * Sets the size of the thumbnail.
      */
     _setThumbnailSize() {
-      const width = 100
-      const height = 100
+      const width = 112
+      const height = 84
       this.$container.css({
         height: `${height}px`,
         'min-height': `${height}px`,

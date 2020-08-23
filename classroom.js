@@ -1,12 +1,19 @@
 import Logger from 'jitsi-meet-logger';
 
-import { showNotification } from './react/features/notifications';
+import {
+    showNotification
+} from './react/features/notifications';
 import AuthHandler from './packages/UI/authentication/AuthHandler';
-import { createRnnoiseProcessorPromise } from './react/features/rnnoise';
+import {
+    createRnnoiseProcessorPromise
+} from './react/features/rnnoise';
 import {
     createTaskQueue
 } from './packages/util/helpers';
-
+import {
+    maybeOpenFeedbackDialog,
+    submitFeedback
+} from './react/features/feedback';
 import {
     createDeviceChangedEvent,
     createStartSilentEvent,
@@ -26,6 +33,7 @@ import {
     isLocalTrackMuted,
     isLocalVideoTrackMuted,
     createLocalTracksF,
+    destroyLocalTracks,
     isUserInteractionRequiredForUnmute,
 } from './react/features/base/tracks';
 
@@ -33,8 +41,10 @@ import {
     conferenceFailed,
     conferenceWillJoin,
     conferenceWillLeave,
-    sendLocalParticipant
-} from './react/features/base/conference';
+    sendLocalParticipant,
+    commonUserJoinedHandling,
+    commonUserLeftHandling
+} from './react/features/base/classroom';
 
 import {
     isFatalJitsiConnectionError,
@@ -109,73 +119,75 @@ class ConferenceConnector {
 
         switch (err) {
 
-        case JitsiConferenceErrors.NOT_ALLOWED_ERROR: {
-            // let's show some auth not allowed page
-            APP.store.dispatch(redirectToStaticPage('static/authError.html'));
-            break;
-        }
+            case JitsiConferenceErrors.NOT_ALLOWED_ERROR: {
+                // let's show some auth not allowed page
+                APP.store.dispatch(redirectToStaticPage(
+                    'static/authError.html'));
+                break;
+            }
 
-        // not enough rights to create conference
-        case JitsiConferenceErrors.AUTHENTICATION_REQUIRED: {
-            // Schedule reconnect to check if someone else created the room.
-            this.reconnectTimeout = setTimeout(() => {
-                APP.store.dispatch(conferenceWillJoin(room));
-                room.join();
-            }, 5000);
+            // not enough rights to create conference
+            case JitsiConferenceErrors.AUTHENTICATION_REQUIRED: {
+                // Schedule reconnect to check if someone else created the room.
+                this.reconnectTimeout = setTimeout(() => {
+                    APP.store.dispatch(conferenceWillJoin(room));
+                    room.join();
+                }, 5000);
 
-            const { password }
-                = APP.store.getState()['features/base/conference'];
+                const {
+                    password
+                } = APP.store.getState()['features/base/conference'];
 
-            AuthHandler.requireAuth(room, password);
+                AuthHandler.requireAuth(room, password);
 
-            break;
-        }
+                break;
+            }
 
-        case JitsiConferenceErrors.RESERVATION_ERROR: {
-            const [ code, msg ] = params;
+            case JitsiConferenceErrors.RESERVATION_ERROR: {
+                const [code, msg] = params;
 
-            APP.classroomUI.notifyReservationError(code, msg);
-            break;
-        }
+                APP.classroomUI.notifyReservationError(code, msg);
+                break;
+            }
 
-        case JitsiConferenceErrors.GRACEFUL_SHUTDOWN:
-            APP.classroomUI.notifyGracefulShutdown();
-            break;
+            case JitsiConferenceErrors.GRACEFUL_SHUTDOWN:
+                APP.classroomUI.notifyGracefulShutdown();
+                break;
 
-        // FIXME FOCUS_DISCONNECTED is a confusing event name.
-        // What really happens there is that the library is not ready yet,
-        // because Jicofo is not available, but it is going to give it another
-        // try.
-        case JitsiConferenceErrors.FOCUS_DISCONNECTED: {
-            const [ focus, retrySec ] = params;
+                // FIXME FOCUS_DISCONNECTED is a confusing event name.
+                // What really happens there is that the library is not ready yet,
+                // because Jicofo is not available, but it is going to give it another
+                // try.
+            case JitsiConferenceErrors.FOCUS_DISCONNECTED: {
+                const [focus, retrySec] = params;
 
-            APP.classroomUI.notifyFocusDisconnected(focus, retrySec);
-            break;
-        }
+                APP.classroomUI.notifyFocusDisconnected(focus, retrySec);
+                break;
+            }
 
-        case JitsiConferenceErrors.FOCUS_LEFT:
-        case JitsiConferenceErrors.ICE_FAILED:
-        case JitsiConferenceErrors.VIDEOBRIDGE_NOT_AVAILABLE:
-        case JitsiConferenceErrors.OFFER_ANSWER_FAILED:
-            APP.store.dispatch(conferenceWillLeave(room));
+            case JitsiConferenceErrors.FOCUS_LEFT:
+            case JitsiConferenceErrors.ICE_FAILED:
+            case JitsiConferenceErrors.VIDEOBRIDGE_NOT_AVAILABLE:
+            case JitsiConferenceErrors.OFFER_ANSWER_FAILED:
+                APP.store.dispatch(conferenceWillLeave(room));
 
-            // FIXME the conference should be stopped by the library and not by
-            // the app. Both the errors above are unrecoverable from the library
-            // perspective.
-            room.leave().then(() => connection.disconnect());
-            break;
+                // FIXME the conference should be stopped by the library and not by
+                // the app. Both the errors above are unrecoverable from the library
+                // perspective.
+                room.leave().then(() => connection.disconnect());
+                break;
 
-        case JitsiConferenceErrors.CONFERENCE_MAX_USERS:
-            connection.disconnect();
-            APP.classroomUI.notifyMaxUsersLimitReached();
-            break;
+            case JitsiConferenceErrors.CONFERENCE_MAX_USERS:
+                connection.disconnect();
+                APP.classroomUI.notifyMaxUsersLimitReached();
+                break;
 
-        case JitsiConferenceErrors.INCOMPATIBLE_SERVER_VERSIONS:
-            APP.store.dispatch(reloadWithStoredParams());
-            break;
+            case JitsiConferenceErrors.INCOMPATIBLE_SERVER_VERSIONS:
+                APP.store.dispatch(reloadWithStoredParams());
+                break;
 
-        default:
-            this._handleConferenceFailed(err, ...params);
+            default:
+                this._handleConferenceFailed(err, ...params);
         }
     }
 
@@ -389,7 +401,27 @@ export default {
      * Setup interaction between conference and UI.
      */
     _setupListeners() {
+        room.on(JitsiConferenceEvents.USER_JOINED, (id, user) => {
+            // The logic shared between RN and web.
+            commonUserJoinedHandling(APP.store, room, user);
 
+            if (user.isHidden()) {
+                return;
+            }
+
+            logger.log(`USER ${id} connnected:`, user);
+        });
+
+        room.on(JitsiConferenceEvents.USER_LEFT, (id, user) => {
+            // The logic shared between RN and web.
+            commonUserLeftHandling(APP.store, room, user);
+
+            if (user.isHidden()) {
+                return;
+            }
+
+            logger.log(`USER ${id} LEFT:`, user);
+        });
     },
 
     /**
@@ -429,8 +461,9 @@ export default {
                     .then(() => {
                         this.localVideo = newTrack;
                         if (newTrack) {
-                            APP.classroomUI.addLocalVideoStream(
-                                newTrack);
+                            APP.classroomUI
+                                .addLocalVideoStream(
+                                    newTrack);
                         }
                         this.setVideoMuteStatus(this
                             .isLocalVideoMuted());
@@ -764,6 +797,52 @@ export default {
      * requested
      */
     hangup(requestFeedback = false) {
+        APP.store.dispatch(destroyLocalTracks());
+        this._localTracksInitialized = false;
+        this.localVideo = null;
+        this.localAudio = null;
 
+        let requestFeedbackPromise;
+
+        if (requestFeedback) {
+            requestFeedbackPromise
+                = APP.store.dispatch(maybeOpenFeedbackDialog(room))
+
+                // false because the thank you dialog shouldn't be displayed
+                .catch(() => Promise.resolve(false));
+        } else {
+            requestFeedbackPromise = Promise.resolve(true);
+        }
+
+        // All promises are returning Promise.resolve to make Promise.all to
+        // be resolved when both Promises are finished. Otherwise Promise.all
+        // will reject on first rejected Promise and we can redirect the page
+        // before all operations are done.
+        Promise.all([
+            requestFeedbackPromise,
+            this.leaveRoomAndDisconnect()
+        ]).then(values => {
+            this._room = undefined;
+            room = undefined;
+
+            APP.API.notifyReadyToClose();
+            APP.store.dispatch(maybeRedirectToWelcomePage(values[0]));
+        });
     },
+
+    /**
+     * Leaves the room and calls JitsiConnection.disconnect.
+     *
+     * @returns {Promise}
+     */
+    leaveRoomAndDisconnect() {
+        APP.store.dispatch(conferenceWillLeave(room));
+
+        if (room && room.isJoined()) {
+            return room.leave().then(disconnect, disconnect);
+        }
+
+        return disconnect();
+    },
+
 }
