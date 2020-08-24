@@ -29,6 +29,8 @@ import {
 } from './react/features/app/actions';
 
 import {
+    trackAdded,
+    trackRemoved,
     replaceLocalTrack,
     isLocalTrackMuted,
     isLocalVideoTrackMuted,
@@ -413,6 +415,7 @@ export default {
      * Setup interaction between conference and UI.
      */
     _setupListeners() {
+        //添加席位
         room.on(JitsiConferenceEvents.USER_JOINED, (id, user) => {
             // The logic shared between RN and web.
             commonUserJoinedHandling(APP.store, room, user);
@@ -434,6 +437,24 @@ export default {
 
             logger.log(`USER ${id} LEFT:`, user);
         });
+
+        // 渲染流
+        room.on(JitsiConferenceEvents.TRACK_ADDED, track => {
+            if (!track || track.isLocal()) {
+                return;
+            }
+
+            APP.store.dispatch(trackAdded(track));
+        });
+
+        room.on(JitsiConferenceEvents.TRACK_REMOVED, track => {
+            if (!track || track.isLocal()) {
+                return;
+            }
+
+            APP.store.dispatch(trackRemoved(track));
+        });
+
     },
 
     /**

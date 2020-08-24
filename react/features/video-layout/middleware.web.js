@@ -35,11 +35,11 @@ MiddlewareRegistry.register(store => next => action => {
 
     switch (action.type) {
     case CONFERENCE_JOINED:
-        VideoLayout.mucJoined();
+        // VideoLayout.mucJoined();
         break;
 
     case CONFERENCE_WILL_LEAVE:
-        VideoLayout.reset();
+        // VideoLayout.reset();
         break;
 
     case PARTICIPANT_JOINED:
@@ -74,18 +74,18 @@ MiddlewareRegistry.register(store => next => action => {
         break;
 
     case SET_FILMSTRIP_VISIBLE:
-        VideoLayout.resizeVideoArea();
+        // VideoLayout.resizeVideoArea();
         break;
 
     case TRACK_ADDED:
         if (!action.track.local) {
-            VideoLayout.onRemoteStreamAdded(action.track.jitsiTrack);
+            SeatLayout.onRemoteStreamAdded(action.track.jitsiTrack);
         }
 
         break;
     case TRACK_REMOVED:
         if (!action.track.local) {
-            VideoLayout.onRemoteStreamRemoved(action.track.jitsiTrack);
+            SeatLayout.onRemoteStreamRemoved(action.track.jitsiTrack);
         }
 
         break;

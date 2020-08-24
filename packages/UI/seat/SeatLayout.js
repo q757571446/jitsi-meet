@@ -18,7 +18,7 @@ function getLocalParticipant() {
     return getLocalParticipantFromStore(APP.store.getState());
 }
 
-export default {
+const SeatLayout = {
     init() {
         localVideoThumbnail = new LocalVideo()
     },
@@ -42,10 +42,10 @@ export default {
         const id = participant.id;
         const jitsiParticipant = APP.classroom.getParticipantById(id);
 
-        const remoteVideo = new RemoteVideo(jitsiParticipant);
+        const remoteVideo = new RemoteVideo(jitsiParticipant, SeatLayout);
         this.addRemoteVideoContainer(id, remoteVideo);
     },
-    
+
     removeParticipantContainer(id) {
         const remoteVideo = remoteVideos[id];
 
@@ -72,4 +72,41 @@ export default {
         // Initialize the view
         remoteVideo.updateView();
     },
+
+    onRemoteStreamAdded(stream) {
+        const id = stream.getParticipantId();
+        const remoteVideo = remoteVideos[id];
+        logger.debug(`Received a new ${stream.getType()} stream for ${id}`);
+        if (!remoteVideo) {
+            logger.debug('No remote video element to add stream');
+
+            return;
+        }
+        remoteVideo.addRemoteStreamElement(stream);
+    },
+
+
+    onRemoteStreamRemoved(stream) {
+        const id = stream.getParticipantId();
+        const remoteVideo = remoteVideos[id];
+
+        // Remote stream may be removed after participant left the conference.
+
+        if (remoteVideo) {
+            remoteVideo.removeRemoteStreamElement(stream);
+        }
+
+    },
+
+
+    // FIXME: what does this do???
+    remoteVideoActive(videoElement, resourceJid) {
+        logger.info(`${resourceJid} video is now active`, videoElement);
+        if (videoElement) {
+            $(videoElement).show();
+        }
+    },
+
 }
+
+export default SeatLayout

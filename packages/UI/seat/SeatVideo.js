@@ -34,4 +34,32 @@ export default class SeatVideo {
             this.container.parentNode.removeChild(this.container);
         }
     }
+
+      /**
+     * Creates an audio or video element for a particular MediaStream.
+     */
+    static createStreamElement(stream) {
+        const isVideo = stream.isVideoTrack();
+        const element = isVideo ? document.createElement('video') : document.createElement('audio');
+
+        if (isVideo) {
+            element.setAttribute('muted', 'true');
+            element.setAttribute('playsInline', 'true'); /* for Safari on iOS to work */
+        } else if (config.startSilent) {
+            element.muted = true;
+        }
+
+        element.autoplay = !config.testing?.noAutoPlayVideo;
+        element.id = SeatVideo.getStreamElementID(stream);
+
+        return element;
+    }
+
+        /**
+     * Returns the element id for a particular MediaStream.
+     */
+    static getStreamElementID(stream) {
+        return (stream.isVideoTrack() ? 'remoteVideo_' : 'remoteAudio_') + stream.getId();
+    }
+
 }
