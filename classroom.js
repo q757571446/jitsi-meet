@@ -44,7 +44,7 @@ import {
     sendLocalParticipant,
     commonUserJoinedHandling,
     commonUserLeftHandling
-} from './react/features/base/classroom';
+} from './react/features/base/conference';
 
 import {
     isFatalJitsiConnectionError,
@@ -395,6 +395,18 @@ export default {
         sendLocalParticipant(APP.store, room);
 
         this._setupListeners();
+    },
+
+    /**
+     * Finds JitsiParticipant for given id.
+     *
+     * @param {string} id participant's identifier(MUC nickname).
+     *
+     * @returns {JitsiParticipant|null} participant instance for given id or
+     * null if not found.
+     */
+    getParticipantById(id) {
+        return room ? room.getParticipantById(id) : null;
     },
 
     /**

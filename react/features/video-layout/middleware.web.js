@@ -15,6 +15,7 @@ import { TRACK_ADDED, TRACK_REMOVED } from '../base/tracks';
 import { SET_FILMSTRIP_VISIBLE } from '../filmstrip';
 
 import './middleware.any';
+import SeatLayout from '../../../packages/UI/seat/SeatLayout';
 
 declare var APP: Object;
 
@@ -43,13 +44,13 @@ MiddlewareRegistry.register(store => next => action => {
 
     case PARTICIPANT_JOINED:
         if (!action.participant.local) {
-            VideoLayout.addRemoteParticipantContainer(
+            SeatLayout.addRemoteParticipantContainer(
                 getParticipantById(store.getState(), action.participant.id));
         }
         break;
 
     case PARTICIPANT_LEFT:
-        VideoLayout.removeParticipantContainer(action.participant.id);
+        SeatLayout.removeParticipantContainer(action.participant.id);
         break;
 
     case PARTICIPANT_UPDATED: {
