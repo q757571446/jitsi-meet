@@ -13,6 +13,7 @@ import {
 import { MiddlewareRegistry } from '../base/redux';
 import { TRACK_ADDED, TRACK_REMOVED } from '../base/tracks';
 import { SET_FILMSTRIP_VISIBLE } from '../filmstrip';
+import { CLIENT_RESIZED } from '../base/responsive-ui';
 
 import './middleware.any';
 import SeatLayout from '../../../packages/UI/seat/SeatLayout';
@@ -34,6 +35,11 @@ MiddlewareRegistry.register(store => next => action => {
     const result = next(action);
 
     switch (action.type) {
+    case CLIENT_RESIZED:
+        const state = store.getState();
+        const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
+        console.log('>>>>>>>>>>>>.', clientWidth)
+        break;
     case CONFERENCE_JOINED:
         // VideoLayout.mucJoined();
         break;
