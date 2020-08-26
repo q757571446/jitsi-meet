@@ -4,9 +4,23 @@ import type { Dispatch } from 'redux';
 
 import {
     SCREEN_SHARE_PARTICIPANTS_UPDATED,
-    SET_TILE_VIEW
+    SET_TILE_VIEW,
+    SET_SEAT_SIZE,
+    SET_LAYOUT_SIZE
 } from './actionTypes';
-import { shouldDisplayTileView } from './functions';
+import { shouldDisplayTileView, caculateLayoutSize } from './functions';
+
+
+export function setLayoutSize(clientWidth: number = 0, clientHeight: number = 0){
+    let res = {
+        type: SET_LAYOUT_SIZE,
+        layoutSize: caculateLayoutSize(clientWidth, clientHeight)
+    }
+    console.log('>>>>>>>>>layoutSize1', res)
+    return res
+}
+
+
 
 /**
  * Creates a (redux) action which signals that the list of known participants

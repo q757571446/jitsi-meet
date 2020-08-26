@@ -13,6 +13,9 @@ export default class SeatVideo {
      * Sets the size of the thumbnail.
      */
     _setThumbnailSize() {
+        const state = APP.store.getState();
+        let layoutSize = state['features/video-layout'].layoutSize;
+        console.log('>>>>>>>>>layoutSize1', layoutSize)
         const width = 112
         const height = 84
         this.$container.css({

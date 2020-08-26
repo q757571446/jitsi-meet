@@ -7,7 +7,7 @@ import {
     SET_FILMSTRIP_HOVERED,
     SET_FILMSTRIP_VISIBLE,
     SET_HORIZONTAL_VIEW_DIMENSIONS,
-    SET_TILE_VIEW_DIMENSIONS
+    SET_TILE_VIEW_DIMENSIONS,
 } from './actionTypes';
 
 const DEFAULT_STATE = {
@@ -85,6 +85,8 @@ ReducerRegistry.register(
                 tileViewDimensions: action.dimensions
             };
         }
+
+
 
         return state;
     });

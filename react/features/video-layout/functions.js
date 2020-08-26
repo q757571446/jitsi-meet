@@ -7,15 +7,6 @@ import { LAYOUTS } from './constants';
 
 declare var interfaceConfig: Object;
 
-export function caculateSeatSize(width: number = 0){
-    const gutter = 6
-    const seatWidth = (width - gutter * 6)/7
-    const seatHeight = seatWidth * (97/141)
-    return {
-        width: seatWidth,
-        height: seatHeight
-    }
-}
 
 export function caculateLayoutSize(clientWidth: number = 0, clientHeight: number = 0) {
     const titleHeight = 30
@@ -23,15 +14,23 @@ export function caculateLayoutSize(clientWidth: number = 0, clientHeight: number
     const seatareaHeight = Math.floor(contentHeight * (113.0 / 690))
     const whiteboardHeight = Math.floor(contentHeight * (576.0 / 690))
 
-    const whiteboardWidth = whiteboardHeight * (16.0 / 9)
+    const whiteboardWidth = Math.floor(whiteboardHeight * (16.0 / 9))
+
+    const gutter = 6
+    const videoWidth = Math.floor((whiteboardWidth - gutter * 6)/7)
+    const videoHeight = Math.floor(videoWidth * (97/141))
     return {
         titlebar: {
             width: clientWidth,
-            height: 30
+            height: titleHeight
         },
         seatarea: {
             width: whiteboardWidth,
             height: seatareaHeight
+        },
+        videosize: {
+            width: videoWidth,
+            height: videoHeight
         },
         whiteboard: {
             width: whiteboardWidth,

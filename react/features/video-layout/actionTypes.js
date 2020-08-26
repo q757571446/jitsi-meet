@@ -20,3 +20,13 @@ export const SCREEN_SHARE_PARTICIPANTS_UPDATED
  * }}
  */
 export const SET_TILE_VIEW = 'SET_TILE_VIEW';
+
+/**
+ * caculate layout size
+ *
+ * @returns {{
+*     type: SET_LAYOUT_SIZE,
+*     layoutSize: object,
+* }}
+*/
+export const SET_LAYOUT_SIZE= 'SET_LAYOUT_SIZE';

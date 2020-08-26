@@ -17,6 +17,7 @@ import { CLIENT_RESIZED } from '../base/responsive-ui';
 
 import './middleware.any';
 import SeatLayout from '../../../packages/UI/seat/SeatLayout';
+import {setLayoutSize} from './actions';
 
 declare var APP: Object;
 
@@ -38,7 +39,7 @@ MiddlewareRegistry.register(store => next => action => {
     case CLIENT_RESIZED:
         const state = store.getState();
         const { clientHeight, clientWidth } = state['features/base/responsive-ui'];
-        console.log('>>>>>>>>>>>>.', clientWidth)
+        store.dispatch(setLayoutSize(clientWidth, clientHeight));
         break;
     case CONFERENCE_JOINED:
         // VideoLayout.mucJoined();
