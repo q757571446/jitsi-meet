@@ -16,7 +16,6 @@ export function setLayoutSize(clientWidth: number = 0, clientHeight: number = 0)
         type: SET_LAYOUT_SIZE,
         layoutSize: caculateLayoutSize(clientWidth, clientHeight)
     }
-    console.log('>>>>>>>>>layoutSize1', res)
     return res
 }
 

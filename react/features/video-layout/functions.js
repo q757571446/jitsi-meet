@@ -7,7 +7,6 @@ import { LAYOUTS } from './constants';
 
 declare var interfaceConfig: Object;
 
-
 export function caculateLayoutSize(clientWidth: number = 0, clientHeight: number = 0) {
     const titleHeight = 30
     const contentHeight = clientHeight - titleHeight
@@ -37,6 +36,13 @@ export function caculateLayoutSize(clientWidth: number = 0, clientHeight: number
             height: whiteboardHeight
         }
     }
+}
+
+export function caculateDefaultLayoutSize() {
+    const clientWidth = document.documentElement ? document.documentElement.clientWidth : 0
+    const clientHeight = document.documentElement ? document.documentElement.clientHeight : 0
+    
+    return caculateLayoutSize(clientWidth, clientHeight)
 }
 
 

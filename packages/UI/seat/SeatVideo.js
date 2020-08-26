@@ -14,15 +14,14 @@ export default class SeatVideo {
      */
     _setThumbnailSize() {
         const state = APP.store.getState();
-        let layoutSize = state['features/video-layout'].layoutSize;
-        console.log('>>>>>>>>>layoutSize1', layoutSize)
+        let { videosize } = state['features/video-layout'].layoutSize;
         const width = 112
         const height = 84
         this.$container.css({
-            height: `${height}px`,
-            'min-height': `${height}px`,
-            'min-width': `${width}px`,
-            width: `${width}px`
+            height: `${videosize.height}px`,
+            // 'min-height': `${height}px`,
+            // 'min-width': `${width}px`,
+            width: `${videosize.width}px`
         });
     }
 

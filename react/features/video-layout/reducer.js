@@ -8,8 +8,10 @@ import {
     SET_LAYOUT_SIZE
 } from './actionTypes';
 
+import { caculateDefaultLayoutSize } from './functions'
+
 const DEFAULT_STATE = {
-    layoutSize: {},
+    layoutSize: caculateDefaultLayoutSize(),
     screenShares: [],
     /**
      * The indicator which determines whether the video layout should display

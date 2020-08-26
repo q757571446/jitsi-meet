@@ -26,6 +26,7 @@ type Props = AbstractProps & {
      * Name for this conference room.
      */
     _roomName: string,
+    layoutSize: Object,
 
     dispatch: Function,
 
@@ -45,7 +46,6 @@ class Conference extends AbstractConference<Props, *> {
      */
     constructor(props) {
         super(props);
-
     }
 
     /**
@@ -82,9 +82,13 @@ class Conference extends AbstractConference<Props, *> {
      * @returns {ReactElement}
      */
     render() {
+        const { layoutSize: { titlebar, seatarea, whiteboard } } = this.props
        return (
          <div id="classroom_page">
-           <div className="classroom_page-seat">
+           <div className="classroom_page-bar" style={{...titlebar}}>
+
+           </div>
+           <div className="classroom_page-seat" style={{...seatarea}}>
             <div id="classroomLocalVideo">
 
             </div>
@@ -92,7 +96,7 @@ class Conference extends AbstractConference<Props, *> {
 
             </div>
            </div>
-           <div className="classroom_page-board"></div>
+           <div className="classroom_page-board" style={{...whiteboard}}></div>
          </div>
        )
     }
@@ -112,6 +116,7 @@ function _mapStateToProps(state) {
     return {
         ...abstractMapStateToProps(state),
         _roomName: getConferenceNameForTitle(state),
+        layoutSize: state['features/video-layout'].layoutSize
     };
 }
 

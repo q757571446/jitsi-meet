@@ -107,6 +107,9 @@ const SeatLayout = {
         }
     },
 
+    resizeVideoSize() {
+        
+    }
 }
 
 export default SeatLayout
